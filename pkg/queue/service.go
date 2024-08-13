@@ -14,7 +14,10 @@ type Queue struct {
 }
 
 func NewQueue(maxMessages int) *Queue {
-	return &Queue{maxMessages: maxMessages}
+	return &Queue{
+		maxMessages: maxMessages,
+		messages:    make([]Message, 0, maxMessages),
+	}
 }
 
 // QueueManager управляет очередями.
