@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"beeline/internal/http-handler"
-	"beeline/pkg/args"
-	"beeline/pkg/queue"
+	"basili4-1982/web-queue/internal/http-handler"
+	"basili4-1982/web-queue/pkg/args"
+	"basili4-1982/web-queue/pkg/queue"
 )
 
 func main() {

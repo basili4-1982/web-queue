@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strconv"
 
-	queue "beeline/pkg/queue"
+	queue "basili4-1982/web-queue/pkg/queue"
 )
 
 type Handler struct {
