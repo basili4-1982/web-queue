@@ -8,8 +8,13 @@ import (
 
 // Queue представляет очередь с сообщениями.
 type Queue struct {
-	messages []Message
-	mu       sync.Mutex
+	messages    []Message
+	mu          sync.Mutex
+	maxMessages int
+}
+
+func NewQueue(maxMessages int) *Queue {
+	return &Queue{maxMessages: maxMessages}
 }
 
 // QueueManager управляет очередями.
@@ -42,21 +47,27 @@ func (qm *QueueManager) GetQueue(name string) (*Queue, error) {
 		return nil, errors.New("max number of queues reached")
 	}
 
-	qm.queues[name] = &Queue{}
+	qm.queues[name] = NewQueue(qm.maxMessages)
 	return qm.queues[name], nil
 }
 
 // PutMessage добавляет сообщение в очередь.
 func (q *Queue) PutMessage(message Message) error {
+	if len(q.messages) >= q.maxMessages {
+		return errors.New("max number of messages reached")
+	}
 	q.messages = append(q.messages, message)
+
 	return nil
 }
 
 // GetMessage извлекает сообщение из очереди.
 func (q *Queue) GetMessage(timeout int) (Message, error) {
 	q.mu.Lock() // синхронизация доступа к очереди
-	//Если 2 клиента обращаются к этой очереди одновременно, то они они выстраиваются в очередь по порядку обращений,
-	//НО если их 3 и более то в момент когда произойдет разблокировка кто то из них случайным образом получит сообщение.
+	//Если 2 клиента обращаются к этой очереди одновременно, то они выстраиваются
+	//в очередь по порядку обращений,
+	//НО если их 3 и более то в момент когда произойдет разблокировка кто-то из них случайным
+	//образом получит сообщение.
 	defer q.mu.Unlock()
 
 	// в очереди нет сообщений следует запустить таймер ожидания
@@ -65,7 +76,7 @@ func (q *Queue) GetMessage(timeout int) (Message, error) {
 		// буду раз в секунду проверять появились ли сообщения до тех пор, пока не появится сообщение или не истекает таймаут
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
-		for _ = range ticker.C {
+		for range ticker.C {
 			if len(q.messages) > 0 { // есть сообщение надо его отдать и выходить
 				break
 			}

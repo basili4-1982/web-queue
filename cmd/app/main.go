@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"beeline/internal/http-handler"
 	"beeline/pkg/args"
-	http_handler "beeline/pkg/http-handler"
 	"beeline/pkg/queue"
 )
 
@@ -19,7 +19,7 @@ func main() {
 	})
 
 	if err != nil {
-		log.Fatalf("can't get args: %w", err)
+		log.Fatalf("can't get args: %s", err.Error())
 	}
 
 	queueManager := queue.NewQueueManager(cfg.MaxQueues, cfg.MaxMessages)
